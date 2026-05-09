@@ -918,8 +918,8 @@ function drawMountainScene(canvas) {
 
     // Capa media — profundidad intermedia
     _mtnFill(ctx, W, H, _mtnPts.mid,
-        'rgba(46,42,72,0.64)', 'rgba(32,28,56,0.72)');
-    _mtnStroke(ctx, W, H, _mtnPts.mid, 'rgba(62,56,92,0.20)', 0.8);
+        'rgba(46,42,72,0.88)', 'rgba(32,28,56,0.94)');
+    _mtnStroke(ctx, W, H, _mtnPts.mid, 'rgba(62,56,92,0.30)', 0.8);
 
     // Capa frontal — silueta oscura con textura de roca
     _mtnFill(ctx, W, H, _mtnPts.near,
