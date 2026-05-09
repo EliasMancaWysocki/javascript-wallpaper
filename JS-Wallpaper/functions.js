@@ -157,3 +157,9 @@ let weatherRefreshInterval = null;
 ensureSunAndMoon();
 setTimeout(ensureSunAndMoon, 300); // re-check opacity una vez que el layout esté pintado
 setInterval(ensureSunAndMoon, 60000);
+
+createMountains();
+
+// Recalcula la opacidad del sol/luna cada vez que cambia el ancho del texto
+new ResizeObserver(() => requestAnimationFrame(updateObjectOpacity))
+    .observe(document.getElementById('container'));
