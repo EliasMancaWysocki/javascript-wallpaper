@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallpaper Interactivo</title>
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- JQuery -->
+    <script src="jquery.js"></script>
+
+    <style>
+        #dev-panel {
+            display: none;
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9999;
+            background: rgba(20, 20, 35, 0.92);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 12px;
+            padding: 18px 20px;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 220px;
+            font-family: monospace;
+            font-size: 13px;
+            color: #ccc;
+        }
+        #dev-panel h3 {
+            margin: 0 0 4px;
+            color: mediumpurple;
+            font-size: 13px;
+        }
+        .dev-row { display: flex; flex-wrap: wrap; gap: 6px; }
+        #dev-panel button {
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 6px;
+            color: #ddd;
+            font-family: monospace;
+            font-size: 12px;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        #dev-panel button:hover  { background: rgba(255,255,255,0.15); }
+        #dev-panel button.active { background: rgba(100,180,255,0.22); border-color: cornflowerblue; color: cornflowerblue; }
+        #dev-panel label { display: flex; flex-direction: column; gap: 3px; color: greenyellow; font-size: 12px; }
+        #dev-panel input[type=range] { width: 100%; accent-color: cornflowerblue; }
+        #dev-panel .val { color: sandybrown; }
+        #dev-panel hr { border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 2px 0; }
+        #dev-hint {
+            display: none;
+            position: fixed;
+            bottom: 12px;
+            right: 16px;
+            z-index: 9999;
+            font-family: monospace;
+            font-size: 11px;
+            color: rgba(255,255,255,0.2);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="wallpaper">
+        <p class="clock" id="container">
+<span class='mediumpurple'>var</span> data <span class='deepskyblue'>=</span> <span class='cornflowerblue'>{</span>
+    <span class='greenyellow'>time:</span> <span class='sandybrown'>"</span><span id='time'>00:00:00</span><span class='sandybrown'>"</span>,
+    <span class='greenyellow'>date:</span> <span class='sandybrown'>"</span><span id='date'>2026-01-01</span><span class='sandybrown'>"</span>,
+    <span class='greenyellow'>weather:</span> <span id='weather-value'><span class='mediumpurple'>null</span>,</span>
+    <span class='greenyellow'>media:</span> <span id='media-value'><span class='mediumpurple'>null</span></span>
+<span class='cornflowerblue'>}</span>
+        </p>
+    </div>
+
+    <!-- Panel de desarrollo (se muestra fuera de WE o con D) -->
+    <div id="dev-panel">
+        <h3>// dev — weather test</h3>
+
+        <label>
+            wind speed: <span class="val" id="dev-wind-val">20</span> km/h
+            <input type="range" id="dev-wind-speed" min="0" max="100" value="20">
+        </label>
+        <label>
+            wind dir: <span class="val" id="dev-dir-val">270° W</span>
+            <input type="range" id="dev-wind-dir" min="0" max="359" value="270">
+        </label>
+
+        <hr>
+        <h3>// condition</h3>
+        <div class="dev-row" id="dev-condition-row">
+            <button onclick="devCondition('Sunny')">☀ Sunny</button>
+            <button onclick="devCondition('Partly cloudy')">⛅ Cloudy</button>
+            <button onclick="devCondition('Light rain')">🌧 Rain</button>
+            <button onclick="devCondition('Thunderstorm')">⛈ Storm</button>
+            <button onclick="devCondition('Blizzard')">❄ Snow</button>
+            <button onclick="devCondition('clear')">✕ Clear</button>
+        </div>
+
+        <hr>
+        <h3>// season override</h3>
+        <div class="dev-row" id="dev-season-row">
+            <button onclick="devSeason('autumn')">🍂 Otoño</button>
+            <button onclick="devSeason('winter')">🌨 Invierno</button>
+            <button onclick="devSeason('spring')">🌸 Primavera</button>
+            <button onclick="devSeason('summer')">🌿 Verano</button>
+            <button onclick="devSeason(null)">↺ Auto</button>
+        </div>
+
+        <hr>
+        <h3>// time of day</h3>
+        <label>
+            hour: <span class="val" id="dev-hour-val">12:00 ☀</span>
+            <input type="range" id="dev-hour" min="0" max="23" value="12">
+        </label>
+
+        <hr>
+        <h3>// moon phase</h3>
+        <label>
+            phase: <span class="val" id="dev-moon-val">🌕 Full</span>
+            <input type="range" id="dev-moon" min="0" max="7" value="4">
+        </label>
+    </div>
+
+    <button id="dev-toggle" onclick="_showDevPanel(!_devPanelVisible)" style="
+        display: none;
+        position: fixed;
+        bottom: 14px;
+        right: 16px;
+        z-index: 9999;
+        background: rgba(20,20,35,0.75);
+        border: 1px solid rgba(255,255,255,0.15);
+        border-radius: 8px;
+        color: rgba(255,255,255,0.35);
+        font-family: monospace;
+        font-size: 11px;
+        padding: 4px 10px;
+        cursor: pointer;
+    ">dev</button>
+
+    <!-- JavaScript -->
+    <script src='weather.js'></script>
+    <script src='functions.js'></script>
+
+    <script>
+        // ── Detección de entorno ──────────────────────────────────────────────
+        // WE llama a applyUserProperties muy rápido al inicio.
+        // Si después de 1.2s nunca se llamó, estamos en el navegador.
+
+        let _devPanelVisible = false;
+
+        function _showDevPanel(show) {
+            _devPanelVisible = show;
+            document.getElementById('dev-panel').style.display = show ? 'flex' : 'none';
+        }
+
+        setTimeout(function () {
+            document.getElementById('dev-toggle').style.display = 'block';
+            if (!window._weActive) _showDevPanel(true);
+        }, 1200);
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'd' || e.key === 'D') _showDevPanel(!_devPanelVisible);
+        });
+
+        // ── Lógica del panel ──────────────────────────────────────────────────
+        const _DIRS = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+        function _dirLabel(deg) { return _DIRS[Math.round(deg / 22.5) % 16]; }
+
+        document.getElementById('dev-wind-speed').addEventListener('input', function () {
+            windSpeedKmph = parseInt(this.value);
+            document.getElementById('dev-wind-val').textContent = windSpeedKmph;
+        });
+
+        document.getElementById('dev-wind-dir').addEventListener('input', function () {
+            windDirDegree = parseInt(this.value);
+            document.getElementById('dev-dir-val').textContent = `${windDirDegree}° ${_dirLabel(windDirDegree)}`;
+        });
+
+        const _MOON_LABELS = [
+            '🌑 Nueva', '🌒 Creciente', '🌓 Cuarto C', '🌔 Gibosa C',
+            '🌕 Llena',  '🌖 Gibosa M', '🌗 Cuarto M', '🌘 Menguante'
+        ];
+        const _MOON_PHASES = [0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875];
+
+        document.getElementById('dev-moon').addEventListener('input', function () {
+            const i = parseInt(this.value);
+            moonPhaseNum = _MOON_PHASES[i];
+            document.getElementById('dev-moon-val').textContent = _MOON_LABELS[i];
+            const moon = document.querySelector('.moon');
+            if (moon && moon.tagName === 'CANVAS') drawMoonPhase(moon, moonPhaseNum);
+        });
+
+        function devCondition(cond) {
+            stopAllAnimations();
+            document.querySelectorAll('#dev-condition-row button').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (cond === 'clear') { collapseWeather(); return; }
+
+            ensureWeatherExpanded();
+            setField('city', 'La Calera');
+            setField('temperature', '15°C');
+            setField('condition', cond);
+            setField('wind', windSpeedKmph > 0 ? `${windSpeedKmph} km/h ${_dirLabel(windDirDegree)}` : null);
+            const wuEl = document.getElementById('weather-updated');
+            if (wuEl) wuEl.textContent = '"ahora"';
+
+            const desc = cond.toLowerCase();
+            if (desc.includes('thunder') || desc.includes('storm'))           startStormAnimation();
+            else if (desc.includes('rain') || desc.includes('drizzle'))       startRainAnimation();
+            else if (desc.includes('snow') || desc.includes('blizzard'))      startSnowAnimation();
+            else if (desc.includes('cloud') || desc.includes('overcast'))     startCloudyAnimation();
+
+            if (!desc.includes('snow') && !desc.includes('blizzard')) startLeavesAnimation();
+        }
+
+        function _hourIcon(h) {
+            if (h >= 6 && h < 17) return '☀';
+            if (h >= 17 && h < 20) return '🌅';
+            return '🌙';
+        }
+
+        function devSeason(season) {
+            document.querySelectorAll('#dev-season-row button').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            // Parchea getCurrentSeason para devolver la estación forzada
+            window.getCurrentSeason = season ? () => season : function() {
+                const month = new Date().getMonth() + 1;
+                if (month >= 3 && month <= 5)  return 'autumn';
+                if (month >= 6 && month <= 8)  return 'winter';
+                if (month >= 9 && month <= 11) return 'spring';
+                return 'summer';
+            };
+            stopLeavesAnimation();
+            if (windSpeedKmph >= 15) startLeavesAnimation();
+        }
+
+        document.getElementById('dev-hour').addEventListener('input', function () {
+            const h = parseInt(this.value);
+            document.getElementById('dev-hour-val').textContent =
+                `${String(h).padStart(2, '0')}:00 ${_hourIcon(h)}`;
+            const _orig = Date;
+            const _fakeNow = new Date();
+            _fakeNow.setHours(h, 0, 0, 0);
+            window.Date = class extends _orig {
+                constructor(...a) { super(...a); if (!a.length) return _fakeNow; }
+                static now() { return _fakeNow.getTime(); }
+            };
+            ensureSunAndMoon();
+            window.Date = _orig;
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Weather Test</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="jquery.js"></script>
+    <style>
+        #test-panel {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9999;
+            background: rgba(20, 20, 35, 0.92);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 12px;
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 220px;
+            font-family: monospace;
+            font-size: 13px;
+            color: #ccc;
+        }
+        #test-panel h3 {
+            margin: 0 0 4px;
+            color: mediumpurple;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+        .btn-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        button {
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 6px;
+            color: #ddd;
+            font-family: monospace;
+            font-size: 12px;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        button:hover  { background: rgba(255,255,255,0.15); }
+        button.active { background: rgba(100,180,255,0.25); border-color: cornflowerblue; color: cornflowerblue; }
+        label { display: flex; flex-direction: column; gap: 3px; color: greenyellow; font-size: 12px; }
+        input[type=range] { width: 100%; accent-color: cornflowerblue; }
+        .val { color: sandybrown; }
+        hr { border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 2px 0; }
+    </style>
+</head>
+<body>
+    <div id="wallpaper">
+        <p class="clock" id="container">
+<span class='mediumpurple'>var</span> data <span class='deepskyblue'>=</span> <span class='cornflowerblue'>{</span>
+    <span class='greenyellow'>time:</span> <span class='sandybrown'>"</span><span id='time'>00:00:00</span><span class='sandybrown'>"</span>,
+    <span class='greenyellow'>date:</span> <span class='sandybrown'>"</span><span id='date'>2026-01-01</span><span class='sandybrown'>"</span>,
+    <span class='greenyellow'>weather:</span> <span id='weather-value'><span class='mediumpurple'>null</span>,</span>
+    <span class='greenyellow'>media:</span> <span id='media-value'><span class='mediumpurple'>null</span></span>
+<span class='cornflowerblue'>}</span>
+        </p>
+    </div>
+
+    <div id="test-panel">
+        <h3>// weather test</h3>
+
+        <label>
+            wind speed: <span class='val' id='wind-val'>20</span> km/h
+            <input type="range" id="wind-speed" min="0" max="100" value="20">
+        </label>
+
+        <label>
+            wind dir: <span class='val' id='dir-val'>270° W</span>
+            <input type="range" id="wind-dir" min="0" max="359" value="270">
+        </label>
+
+        <hr>
+        <h3>// condition</h3>
+        <div class="btn-row">
+            <button onclick="setCondition('Sunny')">☀ Sunny</button>
+            <button onclick="setCondition('Partly cloudy')">⛅ Cloudy</button>
+            <button onclick="setCondition('Light rain')">🌧 Rain</button>
+            <button onclick="setCondition('Thunderstorm')">⛈ Storm</button>
+            <button onclick="setCondition('Blizzard')">❄ Snow</button>
+            <button onclick="setCondition('clear')">✕ Clear</button>
+        </div>
+
+        <hr>
+        <h3>// time of day</h3>
+        <label>
+            hour: <span class='val' id='hour-val'>12:00 ☀</span>
+            <input type="range" id="hour-slider" min="0" max="23" value="12">
+        </label>
+    </div>
+
+    <script src="weather.js"></script>
+    <script>
+        // ── Stubs para que weather.js no explote sin WE ───────────────────────
+        let city = '';
+        let weatherFunction = true;
+        let useGeolocation  = false;
+        let showLastUpdated = true;
+
+        // ── Reloj real ────────────────────────────────────────────────────────
+        function updateClock() {
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2,'0');
+            const m = String(now.getMinutes()).padStart(2,'0');
+            const s = String(now.getSeconds()).padStart(2,'0');
+            document.getElementById('time').textContent = `${h}:${m}:${s}`;
+            const y  = now.getFullYear();
+            const mo = String(now.getMonth()+1).padStart(2,'0');
+            const d  = String(now.getDate()).padStart(2,'0');
+            document.getElementById('date').textContent = `${y}-${mo}-${d}`;
+        }
+        updateClock();
+        setInterval(updateClock, 500);
+
+        // ── Estado de test ────────────────────────────────────────────────────
+        let fakeHour = new Date().getHours() + new Date().getMinutes() / 60;
+
+        function applyWeather(condition) {
+            stopAllAnimations();
+            if (condition === 'clear') { collapseWeather(); return; }
+
+            ensureWeatherExpanded();
+            setField('city',        'La Calera');
+            setField('temperature', '15°C');
+            setField('condition',   condition);
+            setField('wind',        windSpeedKmph > 0 ? `${windSpeedKmph} km/h W` : null);
+            const wuEl = document.getElementById('weather-updated');
+            if (wuEl) wuEl.textContent = '"ahora"';
+
+            const desc = condition.toLowerCase();
+            if (desc.includes('thunder') || desc.includes('storm')) {
+                startStormAnimation();
+            } else if (desc.includes('rain') || desc.includes('drizzle')) {
+                startRainAnimation();
+            } else if (desc.includes('snow') || desc.includes('blizzard') || desc.includes('sleet')) {
+                startSnowAnimation();
+            } else if (desc.includes('cloud') || desc.includes('overcast')) {
+                startCloudyAnimation();
+            }
+            if (!desc.includes('snow') && !desc.includes('blizzard')) {
+                startLeavesAnimation();
+            }
+
+            highlightActive(condition);
+        }
+
+        function setCondition(condition) {
+            applyWeather(condition);
+        }
+
+        function hourIcon(h) {
+            if (h >= 6 && h < 17) return '☀';
+            if (h >= 17 && h < 20) return '🌅';
+            return '🌙';
+        }
+
+        document.getElementById('hour-slider').addEventListener('input', function () {
+            const h = parseInt(this.value);
+            fakeHour = h;
+            document.getElementById('hour-val').textContent =
+                `${String(h).padStart(2, '0')}:00 ${hourIcon(h)}`;
+            patchSunMoon(h);
+        });
+
+        // Parchea ensureSunAndMoon para usar hora fake
+        function patchSunMoon(h) {
+            const sunrise = 6, sunset = 19, offsetX = -50;
+
+            let sun = document.querySelector('.sun');
+            if (!sun) { sun = document.createElement('div'); sun.className = 'sun'; document.body.appendChild(sun); }
+
+            const textBox = document.getElementById('container').getBoundingClientRect();
+
+            if (h >= sunrise && h <= sunset) {
+                const p  = (h - sunrise) / (sunset - sunrise);
+                const cx = window.innerWidth / 2 - offsetX;
+                const cy = window.innerHeight * 0.98;
+                const r  = window.innerWidth / 2.4;
+                sun.style.left    = `${cx + r * Math.cos(Math.PI * (1 - p)) - 50}px`;
+                sun.style.top     = `${cy - r * Math.sin(Math.PI * (1 - p)) - 50}px`;
+                sun.style.display = 'block';
+                sun.style.opacity = overlaps(sun.getBoundingClientRect(), textBox, 60) ? '0.12' : '1';
+            } else {
+                sun.style.display = 'none';
+            }
+
+            let moon = document.querySelector('.moon');
+            if (!moon || moon.tagName !== 'CANVAS') {
+                if (moon) moon.remove();
+                moon = document.createElement('canvas');
+                moon.className = 'moon';
+                moon.width  = 80;
+                moon.height = 80;
+                document.body.appendChild(moon);
+            }
+
+            const nightStart = 19.01, nightEnd = 6;
+            const nightLength = (24 - nightStart) + nightEnd;
+            const mp = h >= nightStart ? (h - nightStart) / nightLength : (h + (24 - nightStart)) / nightLength;
+
+            if (h >= nightStart || h < nightEnd) {
+                const cx = window.innerWidth / 2 - offsetX;
+                const cy = window.innerHeight * 0.95;
+                const r  = window.innerWidth / 2.5;
+                moon.style.left    = `${cx + r * Math.cos(Math.PI * (1 - mp)) - 40}px`;
+                moon.style.top     = `${cy - r * Math.sin(Math.PI * (1 - mp)) - 40}px`;
+                moon.style.display = 'block';
+                drawMoonPhase(moon, moonPhaseNum);
+                moon.style.opacity = overlaps(moon.getBoundingClientRect(), textBox, 50) ? '0.12' : '1';
+            } else {
+                moon.style.display = 'none';
+            }
+        }
+
+        function highlightActive(cond) {
+            document.querySelectorAll('.btn-row button').forEach(b => {
+                b.classList.toggle('active', b.textContent.toLowerCase().includes(cond.toLowerCase().split(' ')[0]));
+            });
+        }
+
+        // ── Sliders ───────────────────────────────────────────────────────────
+        const DIRS = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+        function dirLabel(deg) { return DIRS[Math.round(deg / 22.5) % 16]; }
+
+        document.getElementById('wind-speed').addEventListener('input', function() {
+            windSpeedKmph = parseInt(this.value);
+            document.getElementById('wind-val').textContent = windSpeedKmph;
+        });
+
+        document.getElementById('wind-dir').addEventListener('input', function() {
+            windDirDegree = parseInt(this.value);
+            document.getElementById('dir-val').textContent = `${windDirDegree}° ${dirLabel(windDirDegree)}`;
+        });
+
+        // ── Init ──────────────────────────────────────────────────────────────
+        windSpeedKmph = 20;
+        windDirDegree = 270;
+        ensureSunAndMoon();
+        setInterval(ensureSunAndMoon, 60000);
+    </script>
+</body>
+</html>
