@@ -1,5 +1,4 @@
 const DEV_PANEL_REVEAL_DELAY_MS = 1200;
-const COMPASS_POINTS = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
 const MOON_LABELS = [
     '🌑 Nueva', '🌒 Creciente', '🌓 Cuarto C', '🌔 Gibosa C',
     '🌕 Llena',  '🌖 Gibosa M', '🌗 Cuarto M', '🌘 Menguante',
@@ -12,10 +11,6 @@ let devPanelVisible = false;
 function showDevPanel(show) {
     devPanelVisible = show;
     devPanel.style.display = show ? 'flex' : 'none';
-}
-
-function compassLabel(degrees) {
-    return COMPASS_POINTS[Math.round(degrees / 22.5) % 16];
 }
 
 function hourIcon(hour) {
@@ -55,7 +50,7 @@ function applyDevCondition(condition) {
         temperature: '15°C',
         condition,
         wind:        windSpeedKmph > 0 ? `${windSpeedKmph} km/h ${compassLabel(windDirDegree)}` : null,
-        updated:     'ahora',
+        updated:     formatClockTime(new Date()),
     });
     applyWeatherEffects(condition);
 }

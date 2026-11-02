@@ -13,6 +13,7 @@ const environment = {
 
 const settings = {
     city: '',
+    weatherProvider: 'open-meteo',
     weatherEnabled: true,
     showLastUpdated: true,
     insideWallpaperEngine: false,

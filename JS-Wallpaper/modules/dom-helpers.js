@@ -11,6 +11,12 @@ function setField(id, value) {
     el.innerHTML = `<span class='sandybrown'>"${safe}"</span>`;
 }
 
+const COMPASS_POINTS = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+
+function compassLabel(degrees) {
+    return COMPASS_POINTS[Math.round(degrees / 22.5) % 16];
+}
+
 function overlaps(a, b, margin) {
     return a.left < b.right + margin && a.right > b.left - margin &&
            a.top  < b.bottom + margin && a.bottom > b.top - margin;
