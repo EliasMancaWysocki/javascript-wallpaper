@@ -1,0 +1,56 @@
+#dev-panel {
+    display: none;
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 9999;
+    background: rgba(20, 20, 35, 0.92);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    padding: 18px 20px;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 220px;
+    font-family: monospace;
+    font-size: 13px;
+    color: #ccc;
+}
+#dev-panel h3 {
+    margin: 0 0 4px;
+    color: mediumpurple;
+    font-size: 13px;
+}
+.dev-row { display: flex; flex-wrap: wrap; gap: 6px; }
+#dev-panel button {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 6px;
+    color: #ddd;
+    font-family: monospace;
+    font-size: 12px;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+#dev-panel button:hover  { background: rgba(255,255,255,0.15); }
+#dev-panel button.active { background: rgba(100,180,255,0.22); border-color: cornflowerblue; color: cornflowerblue; }
+#dev-panel label { display: flex; flex-direction: column; gap: 3px; color: greenyellow; font-size: 12px; }
+#dev-panel input[type=range] { width: 100%; accent-color: cornflowerblue; }
+#dev-panel .val { color: sandybrown; }
+#dev-panel hr { border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 2px 0; }
+
+#dev-toggle {
+    display: none;
+    position: fixed;
+    bottom: 14px;
+    right: 16px;
+    z-index: 9999;
+    background: rgba(20,20,35,0.75);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    color: rgba(255,255,255,0.35);
+    font-family: monospace;
+    font-size: 11px;
+    padding: 4px 10px;
+    cursor: pointer;
+}

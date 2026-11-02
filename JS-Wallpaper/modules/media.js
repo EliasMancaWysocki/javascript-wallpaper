@@ -1,23 +1,4 @@
-function updateClock() {
-    const now = new Date();
-    const h = String(now.getHours()).padStart(2, '0');
-    const m = String(now.getMinutes()).padStart(2, '0');
-    const s = String(now.getSeconds()).padStart(2, '0');
 
-    const timeEl = document.getElementById('time');
-    if (timeEl) timeEl.textContent = `${h}:${m}:${s}`;
-
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-
-    const dateEl = document.getElementById('date');
-    if (dateEl) dateEl.textContent = `${year}-${month}-${day}`;
-}
-updateClock();
-setInterval(updateClock, 500);
-
-// ── Media ─────────────────────────────────────────────────────────────────────
 
 let mediaDuration = 0;
 let mediaPosition = 0;
@@ -116,50 +97,3 @@ if (window.wallpaperRegisterMediaPlaybackListener) {
         }
     });
 }
-
-// ── Wallpaper Engine props ────────────────────────────────────────────────────
-
-window.wallpaperPropertyListener = {
-    applyUserProperties: function(properties) {
-        window._weActive = true;
-        if (properties.schemecolor) {
-            const [r, g, b] = properties.schemecolor.value.split(' ').map(v => Math.round(parseFloat(v) * 255));
-            document.body.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
-        }
-
-        if (properties.weather !== undefined) {
-            weatherFunction = properties.weather.value;
-        } else {
-            weatherFunction = true;
-        }
-
-        if (properties.geolocation !== undefined) {
-            useGeolocation = properties.geolocation.value;
-        }
-
-        if (properties.showlastupdated !== undefined) {
-            showLastUpdated = properties.showlastupdated.value;
-        }
-
-        city = properties.city ? properties.city.value.trim() : '';
-        clearInterval(weatherRefreshInterval);
-        getWeather();
-        weatherRefreshInterval = setInterval(getWeather, 1800000);
-    }
-};
-
-let city;
-let weatherFunction;
-let useGeolocation = false;
-let showLastUpdated = true;
-let weatherRefreshInterval = null;
-
-ensureSunAndMoon();
-setTimeout(ensureSunAndMoon, 300); // re-check opacity una vez que el layout esté pintado
-setInterval(ensureSunAndMoon, 60000);
-
-createMountains();
-
-// Recalcula la opacidad del sol/luna cada vez que cambia el ancho del texto
-new ResizeObserver(() => requestAnimationFrame(updateObjectOpacity))
-    .observe(document.getElementById('container'));
