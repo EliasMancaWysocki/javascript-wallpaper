@@ -42,7 +42,7 @@ body {
 
 #container {
     position: relative;
-    z-index: 2;
+    z-index: 3;
     padding: 1.8em 2.4em;
 }
 
