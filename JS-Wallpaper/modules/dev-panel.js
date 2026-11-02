@@ -45,7 +45,7 @@ function applyDevCondition(condition) {
     }
     const { windSpeedKmph, windDirDegree } = environment;
     renderWeather({
-        city:        'La Calera',
+        city:        'Buenos Aires',
         temperature: '15°C',
         condition,
         wind:        windSpeedKmph > 0 ? `${windSpeedKmph} km/h ${compassLabel(windDirDegree)}` : null,
