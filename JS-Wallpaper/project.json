@@ -1,6 +1,6 @@
 {
 	"contentrating" : "Everyone",
-	"description" : "IMPORTANT: You can assign your city in the project.json of the wallpaper, with the format \"city, province/state, country\". You can disable the weather animations from the proyect.json, set true or false.",
+	"description" : "Clock and weather wallpaper styled as a JavaScript object. Shows the time, date, current weather and the track that is playing, over a sky with a sun and moon that follow the real sunrise and sunset, with the real moon phase.\n\nSet your city in the wallpaper properties (City). Leave it empty to use your approximate location. Format: \"city, province/state, country\".\n\nWeather animations (rain, snow, clouds, storms, falling leaves and petals) can be turned off with the Weather option.\n\nWeather data by Open-Meteo.com (https://open-meteo.com/), licensed under CC BY 4.0.",
 	"file" : "wallpaper.html",
 	"general" : 
 	{
@@ -46,7 +46,7 @@
 	"snapshotoverlay" : "",
 	"tags" : [ "Technology" ],
 	"title" : "Clock and Weather JavaScript Wallpaper",
-	"type" : "Web",
+	"type" : "web",
 	"version" : 16,
 	"visibility" : "public",
 	"workshopid" : "3722198703",
