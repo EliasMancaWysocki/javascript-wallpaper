@@ -16,7 +16,8 @@ const settings = {
     weatherProvider: 'open-meteo',
     weatherEnabled: true,
     showLastUpdated: true,
-    insideWallpaperEngine: false,
+    // Wallpaper Engine inyecta estas funciones antes de cargar la página.
+    insideWallpaperEngine: typeof window.wallpaperRegisterMediaStatusListener === 'function',
 };
 
 function getNow() {

@@ -1,4 +1,3 @@
-const DEV_PANEL_REVEAL_DELAY_MS = 1200;
 const MOON_LABELS = [
     '🌑 Nueva', '🌒 Creciente', '🌓 Cuarto C', '🌔 Gibosa C',
     '🌕 Llena',  '🌖 Gibosa M', '🌗 Cuarto M', '🌘 Menguante',
@@ -55,13 +54,21 @@ function applyDevCondition(condition) {
     applyWeatherEffects(condition);
 }
 
-setTimeout(() => {
-    document.getElementById('dev-toggle').style.display = 'block';
-    if (!settings.insideWallpaperEngine) showDevPanel(true);
-}, DEV_PANEL_REVEAL_DELAY_MS);
+const devToggle = document.getElementById('dev-toggle');
 
-document.getElementById('dev-toggle').addEventListener('click', () => showDevPanel(!devPanelVisible));
+function hideDevTools() {
+    showDevPanel(false);
+    devToggle.style.display = 'none';
+}
+
+if (!settings.insideWallpaperEngine) {
+    devToggle.style.display = 'block';
+    showDevPanel(true);
+}
+
+devToggle.addEventListener('click', () => showDevPanel(!devPanelVisible));
 document.addEventListener('keydown', event => {
+    if (settings.insideWallpaperEngine) return;
     if (event.key === 'd' || event.key === 'D') showDevPanel(!devPanelVisible);
 });
 

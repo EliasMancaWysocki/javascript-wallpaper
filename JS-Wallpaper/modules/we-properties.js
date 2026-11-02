@@ -2,6 +2,7 @@
 window.wallpaperPropertyListener = {
     applyUserProperties(properties) {
         settings.insideWallpaperEngine = true;
+        hideDevTools();
 
         if (properties.schemecolor) {
             const [r, g, b] = properties.schemecolor.value.split(' ').map(v => Math.round(parseFloat(v) * 255));
